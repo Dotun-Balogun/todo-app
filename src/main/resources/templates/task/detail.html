@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/fragments :: pageHead(task.title)}"></head>
+<body>
+<div class="app-shell">
+    <div th:replace="~{fragments/fragments :: sidebar('dashboard')}"></div>
+
+    <main class="main" style="max-width: 680px;">
+        <div class="topbar">
+            <div class="topbar-title">
+                <h1 th:text="${task.title}">Task title</h1>
+                <p>
+                    <span class="pill" th:classappend="'pill-priority-' + ${#strings.toLowerCase(task.priority)}" th:text="${task.priority}"></span>
+                    <span class="pill" th:classappend="'pill-status-' + ${#strings.toLowerCase(task.status)}" th:text="${task.status}"></span>
+                </p>
+            </div>
+            <div class="flex gap-8">
+                <a th:href="@{/tasks/{id}/edit(id=${task.id})}" class="btn btn-secondary">Edit</a>
+                <a th:href="@{/dashboard}" class="btn btn-ghost">Back</a>
+            </div>
+        </div>
+
+        <div class="card card-pad" style="margin-bottom: 18px;">
+            <p th:if="${task.description}" th:text="${task.description}" style="white-space: pre-wrap;">Description</p>
+            <p th:unless="${task.description}" class="muted">No description added.</p>
+
+            <div class="task-meta" style="margin-top: 12px;">
+                <span th:if="${task.dueDate}">Due <span th:text="${#temporals.format(task.dueDate, 'EEEE, d MMMM yyyy')}"></span></span>
+                <span th:if="${task.reminderAt}">⏰ Reminder <span th:text="${#temporals.format(task.reminderAt, 'd MMM yyyy, h:mm a')}"></span></span>
+                <span th:if="${task.category}">
+                    <span class="category-dot" th:style="'background:' + ${task.category.colorCode}"></span>
+                    <span th:text="${task.category.name}"></span>
+                </span>
+            </div>
+
+            <form th:action="${task.status.name() == 'COMPLETED'} ? @{/tasks/{id}/incomplete(id=${task.id})} : @{/tasks/{id}/complete(id=${task.id})}"
+                  method="post" style="margin-top: 16px;">
+                <button type="submit" class="btn btn-secondary btn-sm" th:text="${task.status.name() == 'COMPLETED'} ? 'Mark as not done' : 'Mark as done'"></button>
+            </form>
+        </div>
+
+        <div class="card card-pad">
+            <h3>Checklist</h3>
+
+            <div th:if="${not #lists.isEmpty(task.subtasks)}" style="margin-bottom: 14px;">
+                <div th:each="s : ${task.subtasks}" class="flex items-center gap-8" style="padding: 6px 0; border-bottom: 1px solid var(--border-soft);">
+                    <form th:action="@{/tasks/{id}/subtasks/{sid}/toggle(id=${task.id}, sid=${s.id})}" method="post" style="display:contents;">
+                        <button type="submit" style="border:none;background:none;padding:0;cursor:pointer;">
+                            <input type="checkbox" class="task-checkbox" th:checked="${s.completed}" onclick="this.form.requestSubmit()" tabindex="-1"/>
+                        </button>
+                    </form>
+                    <span th:text="${s.title}" th:style="${s.completed} ? 'text-decoration: line-through; color: var(--slate);' : ''" style="flex:1;">Item</span>
+                    <form th:action="@{/tasks/{id}/subtasks/{sid}/delete(id=${task.id}, sid=${s.id})}" method="post">
+                        <button type="submit" class="btn btn-ghost btn-sm">Remove</button>
+                    </form>
+                </div>
+            </div>
+            <p class="muted" th:if="${#lists.isEmpty(task.subtasks)}" style="margin-bottom: 14px;">No checklist items yet — break this task down into smaller steps.</p>
+
+            <form th:action="@{/tasks/{id}/subtasks(id=${task.id})}" method="post" class="flex gap-8">
+                <input type="text" name="title" placeholder="Add a checklist item" required style="flex:1;"/>
+                <button type="submit" class="btn btn-secondary btn-sm">Add</button>
+            </form>
+        </div>
+    </main>
+</div>
+<div th:replace="~{fragments/fragments :: scripts}"></div>
+</body>
+</html>

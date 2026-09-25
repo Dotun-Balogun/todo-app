@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/fragments :: pageHead('Something went wrong')}"></head>
+<body>
+<div class="auth-wrap">
+    <div class="auth-card text-center">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--crest-red); margin-bottom: 10px;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <h3 th:text="${title}">Something went wrong</h3>
+        <p class="muted" th:text="${message}">Please try again.</p>
+        <a th:href="@{/dashboard}" class="btn btn-primary">Back to dashboard</a>
+    </div>
+</div>
+</body>
+</html>

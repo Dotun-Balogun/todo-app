@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/fragments :: pageHead('Create account')}"></head>
+<body>
+<div class="auth-wrap">
+    <div class="auth-card">
+        <div class="auth-brand">
+            <img class="auth-brand-mark" th:src="@{/images/crest.png}" alt="Plateau State Polytechnic crest"/>
+            <div class="auth-brand-text">
+                To-Do List
+                <small>Plateau State Polytechnic, Barkin Ladi</small>
+            </div>
+        </div>
+
+        <h1 style="font-size:1.3rem; margin-bottom: 4px;">Create your account</h1>
+        <p class="muted" style="margin-bottom: 20px; font-size: 0.88rem;">Set up your own space to track tasks and deadlines.</p>
+
+        <div class="alert alert-error" th:if="${errorMessage}" th:text="${errorMessage}"></div>
+
+        <form th:action="@{/register}" method="post">
+            <div class="field">
+                <label for="fullName">Full name</label>
+                <input type="text" id="fullName" name="fullName" th:value="${fullName}" required autofocus/>
+            </div>
+            <div class="field">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" th:value="${username}" required minlength="3"/>
+            </div>
+            <div class="field">
+                <label for="email">Email (optional)</label>
+                <input type="email" id="email" name="email" th:value="${email}"/>
+            </div>
+            <div class="field">
+                <label for="matricNumber">Matriculation number (optional)</label>
+                <input type="text" id="matricNumber" name="matricNumber" th:value="${matricNumber}" placeholder="ND/CS/.../..."/>
+            </div>
+            <div class="field-row">
+                <div class="field">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required minlength="8"/>
+                </div>
+                <div class="field">
+                    <label for="confirmPassword">Confirm password</label>
+                    <input type="password" id="confirmPassword" name="confirmPassword" required minlength="8"/>
+                </div>
+            </div>
+            <p class="muted" style="font-size: 0.78rem; margin-top: -8px; margin-bottom: 16px;">At least 8 characters.</p>
+            <button type="submit" class="btn btn-primary btn-block">Create account</button>
+        </form>
+
+        <div class="auth-footer">
+            Already have an account? <a th:href="@{/login}">Sign in</a>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/fragments :: pageHead('Categories')}"></head>
+<body>
+<div class="app-shell">
+    <div th:replace="~{fragments/fragments :: sidebar('categories')}"></div>
+
+    <main class="main" style="max-width: 560px;">
+        <div class="topbar">
+            <div class="topbar-title">
+                <h1>Categories</h1>
+                <p>Group your tasks however makes sense to you — by course, by project, by life.</p>
+            </div>
+        </div>
+
+        <div class="card card-pad" style="margin-bottom: 20px;">
+            <div class="alert alert-error" th:if="${errorMessage}" th:text="${errorMessage}"></div>
+            <form th:action="@{/categories}" method="post" class="flex gap-8" style="align-items: flex-end;">
+                <div class="field" style="flex:1; margin-bottom:0;">
+                    <label for="name">New category</label>
+                    <input type="text" id="name" name="name" placeholder="e.g. Assignments" required/>
+                </div>
+                <div class="field" style="margin-bottom:0;">
+                    <label for="colorCode">Color</label>
+                    <input type="color" id="colorCode" name="colorCode" value="#B3242F" style="height:38px; width:52px; padding:2px;"/>
+                </div>
+                <button type="submit" class="btn btn-primary">Add</button>
+            </form>
+        </div>
+
+        <div class="card">
+            <div th:if="${#lists.isEmpty(categories)}" class="card-pad muted">No categories yet — add one above.</div>
+            <div th:each="c, iter : ${categories}" class="flex items-center gap-8"
+                 th:style="'padding: 14px 20px;' + (${!iter.last} ? ' border-bottom: 1px solid var(--border-soft);' : '')">
+                <span class="category-dot" th:style="'background:' + ${c.colorCode} + '; width:12px; height:12px;'"></span>
+                <span th:text="${c.name}" style="flex:1; font-weight:500;">Category</span>
+                <form th:action="@{/categories/{id}/delete(id=${c.id})}" method="post" onsubmit="return confirm('Delete this category? Tasks in it will become uncategorized.');">
+                    <button type="submit" class="btn btn-ghost btn-sm">Delete</button>
+                </form>
+            </div>
+        </div>
+    </main>
+</div>
+<div th:replace="~{fragments/fragments :: scripts}"></div>
+</body>
+</html>

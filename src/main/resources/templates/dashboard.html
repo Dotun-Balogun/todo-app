@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:data-theme="${user.darkModePreferred} ? 'dark' : 'light'">
+<head th:replace="~{fragments/fragments :: pageHead('Dashboard')}"></head>
+<body>
+<div class="app-shell">
+    <div th:replace="~{fragments/fragments :: sidebar('dashboard')}"></div>
+
+    <main class="main">
+        <div class="topbar">
+            <div class="topbar-title">
+                <h1>Welcome back, <span th:text="${user.fullName}">Student</span></h1>
+                <p>Here's what's on your plate.</p>
+            </div>
+            <a th:href="@{/tasks/new}" class="btn btn-primary">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                New task
+            </a>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="stat-value" th:text="${totalCount}">0</div>
+                <div class="stat-label">Total tasks</div>
+            </div>
+            <div class="stat-card accent-gold">
+                <div class="stat-value" th:text="${pendingCount}">0</div>
+                <div class="stat-label">Pending</div>
+            </div>
+            <div class="stat-card accent-green">
+                <div class="stat-value" th:text="${completedCount}">0</div>
+                <div class="stat-label">Completed</div>
+            </div>
+            <div class="stat-card accent-red">
+                <div class="stat-value" th:text="${overdueCount}">0</div>
+                <div class="stat-label">Overdue</div>
+            </div>
+        </div>
+
+        <!-- Reminders due -->
+        <div class="reminder-banner" th:if="${not #lists.isEmpty(dueReminders)}">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0; color: var(--crest-gold-deep);"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+            <div>
+                <strong>You have <span th:text="${#lists.size(dueReminders)}">0</span> reminder(s) due</strong>
+                <ul>
+                    <li th:each="t : ${dueReminders}">
+                        <a th:href="@{/tasks/{id}(id=${t.id})}" th:text="${t.title}">Task title</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Quick filter tabs -->
+        <div class="toolbar">
+            <div class="view-tabs">
+                <a th:href="@{/dashboard(view='ALL')}" class="view-tab" th:classappend="${selectedView.name() == 'ALL'} ? 'active'">All</a>
+                <a th:href="@{/dashboard(view='TODAY')}" class="view-tab" th:classappend="${selectedView.name() == 'TODAY'} ? 'active'">Today</a>
+                <a th:href="@{/dashboard(view='THIS_WEEK')}" class="view-tab" th:classappend="${selectedView.name() == 'THIS_WEEK'} ? 'active'">This week</a>
+                <a th:href="@{/dashboard(view='OVERDUE')}" class="view-tab" th:classappend="${selectedView.name() == 'OVERDUE'} ? 'active'">Overdue</a>
+            </div>
+        </div>
+
+        <!-- Search / filter / sort -->
+        <div class="toolbar">
+            <form th:action="@{/dashboard}" method="get">
+                <input type="hidden" name="view" th:value="${selectedView}"/>
+                <input type="search" name="q" class="search-input" placeholder="Search tasks…" th:value="${q}"/>
+
+                <select name="status" onchange="this.form.submit()">
+                    <option value="">Any status</option>
+                    <option th:each="s : ${statuses}" th:value="${s}" th:text="${s}" th:selected="${s == selectedStatus}"></option>
+                </select>
+
+                <select name="categoryId" onchange="this.form.submit()">
+                    <option value="">Any category</option>
+                    <option th:each="c : ${categories}" th:value="${c.id}" th:text="${c.name}" th:selected="${c.id == selectedCategoryId}"></option>
+                </select>
+
+                <select name="sort" onchange="this.form.submit()">
+                    <option value="DUE_DATE_ASC" th:selected="${selectedSort.name() == 'DUE_DATE_ASC'}">Due date (soonest)</option>
+                    <option value="DUE_DATE_DESC" th:selected="${selectedSort.name() == 'DUE_DATE_DESC'}">Due date (latest)</option>
+                    <option value="REMINDER_ASC" th:selected="${selectedSort.name() == 'REMINDER_ASC'}">Reminder date</option>
+                    <option value="PRIORITY_DESC" th:selected="${selectedSort.name() == 'PRIORITY_DESC'}">Priority (high first)</option>
+                    <option value="PRIORITY_ASC" th:selected="${selectedSort.name() == 'PRIORITY_ASC'}">Priority (low first)</option>
+                    <option value="NEWEST" th:selected="${selectedSort.name() == 'NEWEST'}">Newest first</option>
+                    <option value="TITLE_ASC" th:selected="${selectedSort.name() == 'TITLE_ASC'}">Title (A–Z)</option>
+                </select>
+
+                <button type="submit" class="btn btn-secondary btn-sm">Apply</button>
+            </form>
+        </div>
+
+        <!-- Task list -->
+        <div class="task-list" th:if="${tasks.hasContent()}">
+            <div class="task-row" th:each="t : ${tasks.content}" th:classappend="${t.status.name() == 'COMPLETED'} ? 'is-completed'">
+                <form class="task-checkbox-form"
+                      th:action="${t.status.name() == 'COMPLETED'} ? @{/tasks/{id}/incomplete(id=${t.id})} : @{/tasks/{id}/complete(id=${t.id})}"
+                      method="post">
+<input type="hidden" name="redirectTo" th:value="@{/dashboard(q=${q}, status=${selectedStatus}, categoryId=${selectedCategoryId}, view=${selectedView}, sort=${selectedSort}, page=${tasks.number})}"/>                        <input type="checkbox" class="task-checkbox" th:checked="${t.status.name() == 'COMPLETED'}" onclick="this.form.requestSubmit()" tabindex="-1"/>
+                        <input type="checkbox" class="task-checkbox" th:checked="${t.status.name() == 'COMPLETED'}" onclick="this.form.requestSubmit()" tabindex="-1"/>
+                    </button>
+                </form>
+
+                <div class="task-body">
+                    <div class="task-title-row">
+                        <a class="task-title" th:href="@{/tasks/{id}(id=${t.id})}" th:text="${t.title}">Task title</a>
+                        <span class="pill" th:classappend="'pill-priority-' + ${#strings.toLowerCase(t.priority)}" th:text="${t.priority}">MEDIUM</span>
+                        <span class="pill" th:classappend="'pill-status-' + ${#strings.toLowerCase(t.status)}" th:text="${t.status}">PENDING</span>
+                    </div>
+                    <div class="task-meta">
+                        <span th:if="${t.dueDate}">Due <span th:text="${#temporals.format(t.dueDate, 'd MMM yyyy')}">date</span></span>
+                        <span th:if="${t.reminderAt}">⏰ <span th:text="${#temporals.format(t.reminderAt, 'd MMM, h:mm a')}">reminder</span></span>
+                        <span th:if="${t.category}" class="flex items-center gap-8">
+                            <span class="category-dot" th:style="'background:' + ${t.category.colorCode}"></span>
+                            <span th:text="${t.category.name}">Category</span>
+                        </span>
+                        <span th:if="${not #lists.isEmpty(t.subtasks)}" th:text="${t.subtaskCompletedCount} + '/' + ${#lists.size(t.subtasks)} + ' checklist'">0/0</span>
+                    </div>
+                </div>
+
+                <div class="task-actions">
+                    <a th:href="@{/tasks/{id}/edit(id=${t.id})}" class="btn btn-ghost btn-sm">Edit</a>
+                    <form th:action="@{/tasks/{id}/delete(id=${t.id})}" method="post" onsubmit="return confirm('Delete this task? This can\'t be undone.');">
+                        <button type="submit" class="btn btn-ghost btn-sm">Delete</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Empty state -->
+        <div class="empty-state card" th:unless="${tasks.hasContent()}">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="17" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="8" y1="14" x2="16" y2="14"/></svg>
+            <h3>Nothing here yet</h3>
+            <p th:if="${not #strings.isEmpty(q)}">No tasks match "<span th:text="${q}"></span>". Try a different search.</p>
+            <p th:unless="${not #strings.isEmpty(q)}">Add your first task to get started.</p>
+            <a th:href="@{/tasks/new}" class="btn btn-primary" style="margin-top:8px;">New task</a>
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination" th:if="${tasks.totalPages > 1}">
+            <a th:each="pageNum : ${#numbers.sequence(0, tasks.totalPages - 1)}"
+               th:href="@{/dashboard(page=${pageNum}, q=${q}, status=${selectedStatus}, categoryId=${selectedCategoryId}, view=${selectedView}, sort=${selectedSort})}"
+               class="btn btn-sm"
+               th:classappend="${pageNum == tasks.number} ? 'btn-primary' : 'btn-secondary'"
+               th:text="${pageNum + 1}">1</a>
+        </div>
+    </main>
+</div>
+<div th:replace="~{fragments/fragments :: scripts}"></div>
+</body>
+</html>

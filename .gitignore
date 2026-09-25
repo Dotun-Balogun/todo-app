@@ -1,0 +1,24 @@
+# Build output
+target/
+*.jar
+*.war
+
+# Logs
+logs/
+*.log
+
+# IDE
+.vscode/
+.idea/
+*.iml
+.classpath
+.project
+.settings/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment secrets - never commit real credentials
+.env
+application-local.properties

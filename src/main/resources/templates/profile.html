@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/fragments :: pageHead('Profile')}"></head>
+<body>
+<div class="app-shell">
+    <div th:replace="~{fragments/fragments :: sidebar('profile')}"></div>
+
+    <main class="main" style="max-width: 560px;">
+        <div class="topbar">
+            <div class="topbar-title">
+                <h1>Your profile</h1>
+                <p>Update your details or change your password.</p>
+            </div>
+        </div>
+
+        <div class="alert alert-success" th:if="${successMessage}" th:text="${successMessage}"></div>
+        <div class="alert alert-error" th:if="${errorMessage}" th:text="${errorMessage}"></div>
+
+        <div class="card card-pad" style="margin-bottom: 20px;">
+            <h3>Account details</h3>
+            <form th:action="@{/profile}" method="post">
+                <div class="field">
+                    <label>Username</label>
+                    <input type="text" th:value="${user.username}" disabled/>
+                </div>
+                <div class="field">
+                    <label for="fullName">Full name</label>
+                    <input type="text" id="fullName" name="fullName" th:value="${user.fullName}" required/>
+                </div>
+                <div class="field">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" th:value="${user.email}"/>
+                </div>
+                <button type="submit" class="btn btn-primary">Save changes</button>
+            </form>
+        </div>
+
+        <div class="card card-pad">
+            <h3>Change password</h3>
+            <form th:action="@{/profile/password}" method="post">
+                <div class="field">
+                    <label for="currentPassword">Current password</label>
+                    <input type="password" id="currentPassword" name="currentPassword" required/>
+                </div>
+                <div class="field-row">
+                    <div class="field">
+                        <label for="newPassword">New password</label>
+                        <input type="password" id="newPassword" name="newPassword" required minlength="8"/>
+                    </div>
+                    <div class="field">
+                        <label for="confirmNewPassword">Confirm new password</label>
+                        <input type="password" id="confirmNewPassword" name="confirmNewPassword" required minlength="8"/>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-secondary">Change password</button>
+            </form>
+        </div>
+    </main>
+</div>
+<div th:replace="~{fragments/fragments :: scripts}"></div>
+</body>
+</html>

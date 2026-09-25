@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/fragments :: pageHead(${task.id} != null ? 'Edit task' : 'New task')}"></head>
+<body>
+<div class="app-shell">
+    <div th:replace="~{fragments/fragments :: sidebar('dashboard')}"></div>
+
+    <main class="main" style="max-width: 640px;">
+        <div class="topbar">
+            <div class="topbar-title">
+                <h1 th:text="${task.id} != null ? 'Edit task' : 'New task'">New task</h1>
+                <p>Give it a clear title so future-you knows exactly what to do.</p>
+            </div>
+        </div>
+
+        <div class="card card-pad">
+            <div class="alert alert-error" th:if="${errorMessage}" th:text="${errorMessage}"></div>
+
+            <form th:action="${task.id} != null ? @{/tasks/{id}(id=${task.id})} : @{/tasks}" method="post">
+                <div class="field">
+                    <label for="title">Title</label>
+                    <input type="text" id="title" name="title" th:value="${task.title}" required maxlength="150" autofocus/>
+                </div>
+
+                <div class="field">
+                    <label for="description">Description</label>
+                    <textarea id="description" name="description" th:text="${task.description}" placeholder="Any extra detail (optional)"></textarea>
+                </div>
+
+                <div class="field-row">
+                    <div class="field">
+                        <label for="dueDate">Due date</label>
+                        <input type="date" id="dueDate" name="dueDate" th:value="${task.dueDate}"/>
+                    </div>
+                    <div class="field">
+                        <label for="priority">Priority</label>
+                        <select id="priority" name="priority">
+                            <option th:each="p : ${priorities}" th:value="${p}" th:text="${p}" th:selected="${p == task.priority}"></option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="field-row">
+                    <div class="field">
+                        <label for="reminderAt">Reminder (optional)</label>
+                        <input type="datetime-local" id="reminderAt" name="reminderAt" th:value="${task.reminderAt}"/>
+                    </div>
+                    <div class="field">
+                        <label for="categoryId">Category</label>
+                        <select id="categoryId" name="categoryId">
+                            <option value="">None</option>
+                            <option th:each="c : ${categories}" th:value="${c.id}" th:text="${c.name}"
+                                    th:selected="${task.category != null and c.id == task.category.id}"></option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="flex gap-8" style="margin-top: 20px;">
+                    <button type="submit" class="btn btn-primary" th:text="${task.id} != null ? 'Save changes' : 'Create task'">Save</button>
+                    <a th:href="@{/dashboard}" class="btn btn-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </main>
+</div>
+<div th:replace="~{fragments/fragments :: scripts}"></div>
+</body>
+</html>

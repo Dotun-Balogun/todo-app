@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/fragments :: pageHead('Not found')}"></head>
+<body>
+<div class="auth-wrap">
+    <div class="auth-card text-center">
+        <h1 style="font-size: 2.4rem;">404</h1>
+        <h3 th:text="${title}">Not found</h3>
+        <p class="muted" th:text="${message}">We couldn't find what you were looking for.</p>
+        <a th:href="@{/dashboard}" class="btn btn-primary">Back to dashboard</a>
+    </div>
+</div>
+</body>
+</html>

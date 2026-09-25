@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/fragments :: pageHead('Sign in')}"></head>
+<body>
+<div class="auth-wrap">
+    <div class="auth-card">
+        <div class="auth-brand">
+            <img class="auth-brand-mark" th:src="@{/images/crest.png}" alt="Plateau State Polytechnic crest"/>
+            <div class="auth-brand-text">
+                To-Do List
+                <small>Plateau State Polytechnic, Barkin Ladi</small>
+            </div>
+        </div>
+
+        <h1 style="font-size:1.3rem; margin-bottom: 4px;">Welcome back</h1>
+        <p class="muted" style="margin-bottom: 20px; font-size: 0.88rem;">Sign in to manage your tasks.</p>
+
+        <div class="alert alert-error" th:if="${errorMessage}" th:text="${errorMessage}"></div>
+        <div class="alert alert-info" th:if="${infoMessage}" th:text="${infoMessage}"></div>
+        <div class="alert alert-success" th:if="${registered}">Account created. You can sign in now.</div>
+
+        <form th:action="@{/login}" method="post">
+            <div class="field">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" required autofocus/>
+            </div>
+            <div class="field">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required/>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">Sign in</button>
+        </form>
+
+        <div class="auth-footer">
+            New here? <a th:href="@{/register}">Create an account</a>
+        </div>
+    </div>
+</div>
+</body>
+</html>
