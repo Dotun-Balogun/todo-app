@@ -273,3 +273,6 @@ today), sharing or delegating tasks between students, and an admin panel for sta
 
 
 XswNko1234$$
+
+
+2026-09-26T08:12:59.109Z  WARN 1 --- [todo-app] [           main] org.hibernate.orm.deprecation            : HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
